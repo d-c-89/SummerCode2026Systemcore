@@ -7,11 +7,13 @@ package frc.robot.subsystems;
 import org.wpilib.command2.Command;
 import org.wpilib.command2.SubsystemBase;
 
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
+import org.wpilib.hardware.bus.CANPort;
 
 import frc.robot.Constants.operatorConstants;
 
@@ -24,8 +26,8 @@ public class ShooterSubsystem extends SubsystemBase
   // setup shooter subsystem
   public ShooterSubsystem()
    {
-   m_leader= new TalonFX(operatorConstants.kShooterLeaderId); 
-   m_follower= new TalonFX(operatorConstants.kShooterFollowerId);
+   m_leader= new TalonFX(operatorConstants.kShooterLeaderId, new CANBus(CANPort.CAN_S0)); 
+   m_follower= new TalonFX(operatorConstants.kShooterFollowerId,  new CANBus(CANPort.CAN_S0));
    m_follower.setControl(new Follower(operatorConstants.kShooterLeaderId, MotorAlignmentValue.Opposed));
 
   var talonFXConfigs = new TalonFXConfiguration();
@@ -56,7 +58,7 @@ public class ShooterSubsystem extends SubsystemBase
 
   public void stopShooter()
   {
-    m_leader.set(0);
+    m_leader.setThrottle(0);
   }
 
   /**

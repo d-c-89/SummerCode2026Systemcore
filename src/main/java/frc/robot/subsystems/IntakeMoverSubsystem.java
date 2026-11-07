@@ -19,7 +19,8 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
-import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.hardware.bus.CANPort;
+import org.wpilib.telemetry.*;
 
 public class IntakeMoverSubsystem extends SubsystemBase 
 {
@@ -33,7 +34,7 @@ public class IntakeMoverSubsystem extends SubsystemBase
   public IntakeMoverSubsystem()
    {
    
-    m_IntakeMoverMotor = new SparkMax(operatorConstants.kIntakeMoverMotorId, MotorType.kBrushless);
+    m_IntakeMoverMotor = new SparkMax(CANPort.CAN_S0, operatorConstants.kIntakeMoverMotorId, MotorType.kBrushless);
    //brushed or brushless?
     m_config = new SparkMaxConfig();
     m_config.idleMode(IdleMode.kBrake);
@@ -51,13 +52,13 @@ public class IntakeMoverSubsystem extends SubsystemBase
   
   public void setSpeed(double speed)
   {
-    m_IntakeMoverMotor.set(speed);
-    SmartDashboard.putNumber("intakemovermotor", m_IntakeMoverMotor.getEncoder().getPosition());
+    m_IntakeMoverMotor.setThrottle(speed);
+    Telemetry.log("intakemovermotor", m_IntakeMoverMotor.getEncoder().getPosition());
   }
 
   public void stopIntakeMover()
   {
-    m_IntakeMoverMotor.set(0);
+    m_IntakeMoverMotor.setThrottle(0);
   }
 
   

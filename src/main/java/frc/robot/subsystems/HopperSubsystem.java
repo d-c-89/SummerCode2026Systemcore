@@ -6,6 +6,8 @@ package frc.robot.subsystems;
 
 import org.wpilib.command2.Command;
 import org.wpilib.command2.SubsystemBase;
+import org.wpilib.hardware.bus.CAN;
+import org.wpilib.hardware.bus.CANPort;
 
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -19,6 +21,7 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
+import org.wpilib.hardware.bus.CANPort;
 
 public class HopperSubsystem extends SubsystemBase 
 {
@@ -30,8 +33,8 @@ public class HopperSubsystem extends SubsystemBase
   // setup hopper subsystem
   public HopperSubsystem()
    {
-   
-    m_HopperMotor = new SparkMax(operatorConstants.kHopperMotorId, MotorType.kBrushless);
+    
+    m_HopperMotor = new SparkMax(CANPort.CAN_S0, operatorConstants.kHopperMotorId, MotorType.kBrushless);
    //brushed or brushless???
     
 
@@ -39,12 +42,12 @@ public class HopperSubsystem extends SubsystemBase
   public void setHopperSpeed(double speed)
 
   {
-    m_HopperMotor.set(speed);
+    m_HopperMotor.setThrottle(speed);
   }
 
   public void stopHopper()
   {
-    m_HopperMotor.set(0);
+    m_HopperMotor.setThrottle(0);
   }
 
   /**
