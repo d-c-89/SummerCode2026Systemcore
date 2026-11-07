@@ -82,7 +82,8 @@ public class RobotContainer {
 
 
 
-        drivetrain.initTelemetry();
+        //drivetrain.initTelemetry(); 
+        //REMOVED. ABOVE LINE WAS PRESENT IN 2026 CODE
         configureBindings();
         autoChooser = AutoBuilder.buildAutoChooser();
         Telemetry.log("Auto", autoChooser);
