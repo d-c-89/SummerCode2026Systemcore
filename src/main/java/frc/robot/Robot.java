@@ -9,6 +9,7 @@ import com.ctre.phoenix6.HootAutoReplay;
 
 import org.wpilib.vision.stream.CameraServer;
 import org.wpilib.vision.camera.HttpCamera;
+
 import org.wpilib.driverstation.MatchState;
 import org.wpilib.driverstation.RobotState;
 import org.wpilib.driverstation.Alliance;
@@ -22,6 +23,8 @@ import org.wpilib.command2.CommandScheduler;
 import frc.robot.LimelightHelpers.PoseEstimate;
 import org.wpilib.math.util.Units;
 import frc.robot.subsystems.TurretSubsystem;
+
+
 
 
 public class Robot extends TimedRobot {
@@ -40,11 +43,6 @@ public class Robot extends TimedRobot {
     }
 
     @Override
-    public void robotInit() {
-        
-    }
-
-    @Override
     public void robotPeriodic() {
         m_timeAndJoystickReplay.update();
         CommandScheduler.getInstance().run(); 
@@ -53,7 +51,7 @@ public class Robot extends TimedRobot {
         // Updating vision with limelight
         var driveState = m_robotContainer.drivetrain.getState();
         double headingDeg = driveState.Pose.getRotation().getDegrees();
-        double omegaRps = Units.radiansToRotations(driveState.Speeds.omega);  
+            final double omegaRps = Units.radiansToRotations(driveState.Velocity.omega);
 
        
         //use tag filtering to decide whether to use mt1 or mt2
@@ -96,6 +94,7 @@ public class Robot extends TimedRobot {
         HttpCamera limelightFeed = new HttpCamera("Limelight Stream", "http://limelight.local:5800/stream.mjpg");
         
         CameraServer.startAutomaticCapture(limelightFeed);
+
         m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
         if (m_autonomousCommand != null) {
