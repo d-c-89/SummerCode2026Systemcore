@@ -19,6 +19,7 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
+import org.wpilib.hardware.bus.CANPort;
 
 public class IntakeSubsystem extends SubsystemBase 
 {
@@ -30,19 +31,19 @@ public class IntakeSubsystem extends SubsystemBase
   public IntakeSubsystem()
    {
    
-    m_IntakeMotor = new SparkMax(operatorConstants.kIntakeMotorId, MotorType.kBrushless);
+    m_IntakeMotor = new SparkMax(CANPort.CAN_S0, operatorConstants.kIntakeMotorId, MotorType.kBrushless);
    //brushed or brushless?
     
 
   }
   public void setIntakeSpeed(double speed)
   {
-    m_IntakeMotor.set(speed);
+    m_IntakeMotor.setThrottle(speed);
   }
 
   public void stopIntake()
   {
-    m_IntakeMotor.set(0);
+    m_IntakeMotor.setThrottle(0);
   }
 
   /**

@@ -4,17 +4,20 @@
 
 package frc.robot.subsystems;
 
-import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.telemetry.*;
 import org.wpilib.command2.Command;
 import org.wpilib.command2.Commands;
 import org.wpilib.command2.SubsystemBase;
+import org.wpilib.hardware.bus.CANPort;
 
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import org.wpilib.hardware.bus.CANPort;
 
 import frc.robot.Constants.operatorConstants;
 
@@ -28,7 +31,7 @@ public class TurretSubsystem extends SubsystemBase
   // setup shooter subsystem
   public TurretSubsystem()
    {
-   m_turret= new TalonFX(operatorConstants.kTurretMotorId); /**add correct device id's later */
+   m_turret= new TalonFX(operatorConstants.kTurretMotorId,  new CANBus(CANPort.CAN_S0)); /**add correct device id's later */
    // in init function
     var talonFXConfigs = new TalonFXConfiguration();
 
@@ -57,7 +60,7 @@ public class TurretSubsystem extends SubsystemBase
   }
   public void setTurretSpeed(double speed)
   {
-    m_turret.set(speed);
+    m_turret.setThrottle(speed);
   }
   private static final double OFFSET_STEP = Math.toRadians(5);
   public Command offsetLeft()  { return Commands.runOnce(() -> offset -= OFFSET_STEP); }
@@ -72,7 +75,7 @@ public class TurretSubsystem extends SubsystemBase
 
   public void stopTurret()
   {
-    m_turret.set(0);
+    m_turret.setThrottle(0);
   }
 
   public void goToLocation(double rotations)
@@ -132,7 +135,7 @@ public class TurretSubsystem extends SubsystemBase
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    SmartDashboard.putNumber("currentTurretOffset", returnOffset());
+    Telemetry.log("currentTurretOffset", returnOffset());
   }
 
   @Override

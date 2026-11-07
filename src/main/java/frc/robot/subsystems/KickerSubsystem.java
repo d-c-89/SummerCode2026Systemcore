@@ -19,6 +19,7 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
+import org.wpilib.hardware.bus.CANPort;
 
 public class KickerSubsystem extends SubsystemBase 
 {
@@ -30,19 +31,19 @@ public class KickerSubsystem extends SubsystemBase
   public KickerSubsystem()
    {
    
-    m_KickerMotor = new SparkMax(operatorConstants.kKickerMotorId, MotorType.kBrushless);
+    m_KickerMotor = new SparkMax(CANPort.CAN_S0, operatorConstants.kKickerMotorId, MotorType.kBrushless);
    //brushed or brushless?
     
 
   }
   public void setKickerSpeed(double speed)
   {
-    m_KickerMotor.set(speed);
+    m_KickerMotor.setThrottle(speed);
   }
 
   public void stopKicker()
   {
-    m_KickerMotor.set(0);
+    m_KickerMotor.setThrottle(0);
   }
 
   /**
