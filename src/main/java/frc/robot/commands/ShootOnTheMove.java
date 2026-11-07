@@ -17,14 +17,16 @@ import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.kinematics.ChassisVelocities;
-import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.telemetry.*;
+import org.wpilib.tunable.*;
+import org.wpilib.tunable.TunableDouble;
+import org.wpilib.tunable.Tunables;
 import org.wpilib.driverstation.MatchState;
 import org.wpilib.driverstation.RobotState;
 import org.wpilib.driverstation.Alliance;
 import org.wpilib.driverstation.MatchType;
 import org.wpilib.driverstation.DriverStationErrors;
 import org.wpilib.driverstation.Alliance;
-import org.wpilib.smartdashboard.SendableChooser;
 import org.wpilib.system.Timer;
 
 
@@ -46,6 +48,10 @@ public class ShootOnTheMove extends Command {
   private double hubX;
   private double hubY;
   private double time;
+
+
+  private final TunableDouble latency = Tunables.addDouble("kLatency", 0.12);
+  private final TunableDouble tofScale = Tunables.addDouble("kTOFScale", 1.1); 
 
   
   //private final RunIntakeHopper m_subsystem;
@@ -70,9 +76,6 @@ public class ShootOnTheMove extends Command {
     m_hopper = hopper;
     addRequirements(hopper);
     this.time = time;
-    SmartDashboard.putNumber("kLatency", 0.12);
-    SmartDashboard.putNumber("kTOFScale", 1.1);
-    
 
   }
 
@@ -115,8 +118,10 @@ public class ShootOnTheMove extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double latency = SmartDashboard.getNumber("kLatency", 0.12);
-    double tofScale = SmartDashboard.getNumber("kTOFScale", 1.1);
+    
+    //update values
+    latency.set(latency.get());
+    tofScale.set(tofScale.get());
     
     var state = m_drivetrain.getState();
     Pose2d pose = state.Pose;
@@ -124,13 +129,13 @@ public class ShootOnTheMove extends Command {
     Translation2d robotVel = new Translation2d(v.vx, v.vy);
 
     // Where the robot will be when the shot actually happens
-    Translation2d robot = pose.getTranslation().plus(robotVel.times(latency));
+    Translation2d robot = pose.getTranslation().plus(robotVel.times(latency.get()));
     Translation2d hub = new Translation2d(hubX, hubY);
 
     // Virtual target: offset the hub by robot velocity x flight time
     Translation2d target = hub;
     for (int i = 0; i < 3; i++) {
-      double tof = timeOfFlight(target.minus(robot).getNorm(), tofScale);
+      double tof = timeOfFlight(target.minus(robot).getNorm(), tofScale.get());
       target = hub.minus(robotVel.times(tof));
     }
     double d = target.minus(robot).getNorm();
