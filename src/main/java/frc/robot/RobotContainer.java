@@ -16,13 +16,14 @@ import org.wpilib.smartdashboard.SendableChooser;
 import org.wpilib.smartdashboard.SmartDashboard;
 import org.wpilib.command2.Command;
 import org.wpilib.command2.Commands;
-import org.wpilib.command2.button.CommandXboxController;
+import org.wpilib.command2.button.CommandGamepad;
 import org.wpilib.command2.button.RobotModeTriggers;
 import org.wpilib.command2.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants.operatorConstants;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import com.pathplanner.lib.auto.NamedCommands;
+import org.wpilib.driverstation.Gamepad;
 
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
@@ -58,8 +59,8 @@ public class RobotContainer {
 
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
-    private final CommandXboxController driverController0 = new CommandXboxController(0);
-    private final CommandXboxController driverController1 = new CommandXboxController(1);
+    private final CommandGamepad driverController0 = new CommandGamepad(0);
+    private final CommandGamepad driverController1 = new CommandGamepad(1);
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
@@ -98,6 +99,14 @@ public class RobotContainer {
         NamedCommands.registerCommand("deployIntake", new DeployIntake(m_IntakeMoverSubsystem));
         NamedCommands.registerCommand("RetractIntake", new RetractIntake(m_IntakeMoverSubsystem));
 
+        int aButton = 1;
+        int bButton = 2;
+        int xButton = 3;
+        int yButton = 4;
+        int povleftButton = 14;
+        int povrightButton = 13;
+        int povupButton = 11;
+
         //DRIVETRAIN KEYBINDS
         // Note that X is defined as forward according to WPILib convention,
         // and Y is defined as to the left according to WPILib convention
@@ -117,18 +126,18 @@ public class RobotContainer {
             drivetrain.applyRequest(() -> idle).ignoringDisable(true)
         );
 
-        driverController0.a().whileTrue(drivetrain.applyRequest(() -> brake));
-        driverController0.b().whileTrue(drivetrain.applyRequest(() ->
+        driverController0.button(aButton).whileTrue(drivetrain.applyRequest(() -> brake));
+        driverController0.button(bButton).whileTrue(drivetrain.applyRequest(() ->
             point.withModuleDirection(new Rotation2d(-driverController0.getLeftY(), -driverController0.getLeftX()))
         ));
 
         // Run SysId routines when holding back/start and X/Y.
         // Note that each routine should be run exactly once in a single log.
 
-        driverController0.back().and(driverController0.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
-        driverController0.back().and(driverController0.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
-        driverController0.start().and(driverController0.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
-        driverController0.start().and(driverController0.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
+        driverController0.back().and(driverController0.button(yButton)).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
+        driverController0.back().and(driverController0.button(xButton)).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
+        driverController0.start().and(driverController0.button(yButton)).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
+        driverController0.start().and(driverController0.button(xButton)).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
         // Reset the field-centric heading on left bumper press.
         //driverController0.leftBumper().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
@@ -138,31 +147,31 @@ public class RobotContainer {
         //COMMAND KEYBINDS
         //CONTROLLER 0
         driverController0.leftTrigger().whileTrue(m_IntakeSubsystem.runIntake());
-        driverController0.x().whileTrue(new RunIntakeHopperOut(m_HopperSubsystem, m_IntakeSubsystem));
-        driverController0.y().whileTrue(new OutTakeKickerHopper(m_HopperSubsystem, m_KickerSubsystem));
+        driverController0.button(xButton).whileTrue(new RunIntakeHopperOut(m_HopperSubsystem, m_IntakeSubsystem));
+        driverController0.button(yButton).whileTrue(new OutTakeKickerHopper(m_HopperSubsystem, m_KickerSubsystem));
 
         driverController0.rightBumper().whileTrue(m_IntakeMoverSubsystem.intakeMoverSpeed(0.3));
         driverController0.leftBumper().whileTrue(m_IntakeMoverSubsystem.intakeMoverSpeed(-0.3));
         driverController0.rightTrigger().whileTrue(new ShootOnTheMove(m_ShooterSubsystem, m_TurretSubsystem, drivetrain, m_KickerSubsystem, m_HopperSubsystem, 0));
-        driverController0.povLeft().onTrue(m_TurretSubsystem.offsetLeft());
-        driverController0.povRight().onTrue(m_TurretSubsystem.offsetRight());
-        driverController0.povUp().onTrue(m_TurretSubsystem.offsetZero());
+        driverController0.button(povleftButton).onTrue(m_TurretSubsystem.offsetLeft());
+        driverController0.button(povrightButton).onTrue(m_TurretSubsystem.offsetRight());
+        driverController0.button(povupButton).onTrue(m_TurretSubsystem.offsetZero());
 
         //CONTROLLER 1
         
         //driverController1.x().whileTrue();
         driverController1.leftTrigger().whileTrue(m_IntakeSubsystem.runIntake());
-        driverController1.x().whileTrue(new RunIntakeHopperOut(m_HopperSubsystem, m_IntakeSubsystem));
-        driverController1.y().whileTrue(new OutTakeKickerHopper(m_HopperSubsystem, m_KickerSubsystem));
-        driverController1.a().whileTrue(new Shoot(m_ShooterSubsystem, m_TurretSubsystem, drivetrain, m_KickerSubsystem, m_HopperSubsystem, 0));
+        driverController1.button(xButton).whileTrue(new RunIntakeHopperOut(m_HopperSubsystem, m_IntakeSubsystem));
+        driverController1.button(yButton).whileTrue(new OutTakeKickerHopper(m_HopperSubsystem, m_KickerSubsystem));
+        driverController1.button(aButton).whileTrue(new Shoot(m_ShooterSubsystem, m_TurretSubsystem, drivetrain, m_KickerSubsystem, m_HopperSubsystem, 0));
 
         driverController1.rightBumper().whileTrue(m_IntakeMoverSubsystem.intakeMoverSpeed(0.3));
         driverController1.leftBumper().whileTrue(m_IntakeMoverSubsystem.intakeMoverSpeed(-0.3));
         
         driverController1.rightTrigger().whileTrue(new ShootOnTheMove(m_ShooterSubsystem, m_TurretSubsystem, drivetrain, m_KickerSubsystem, m_HopperSubsystem, 0));
-        driverController1.povLeft().onTrue(m_TurretSubsystem.offsetLeft());
-        driverController1.povRight().onTrue(m_TurretSubsystem.offsetRight());
-        driverController1.povUp().onTrue(m_TurretSubsystem.offsetZero());
+        driverController1.button(povleftButton).onTrue(m_TurretSubsystem.offsetLeft());
+        driverController1.button(povrightButton).onTrue(m_TurretSubsystem.offsetRight());
+        driverController1.button(povupButton).onTrue(m_TurretSubsystem.offsetZero());
 
 
         

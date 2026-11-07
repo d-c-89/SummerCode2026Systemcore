@@ -16,7 +16,7 @@ import org.wpilib.driverstation.MatchType;
 import org.wpilib.driverstation.DriverStationErrors;
 import org.wpilib.framework.TimedRobot;
 import org.wpilib.smartdashboard.Field2d;
-import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.telemetry.*;
 import org.wpilib.command2.Command;
 import org.wpilib.command2.CommandScheduler;
 import frc.robot.LimelightHelpers.PoseEstimate;
@@ -73,8 +73,7 @@ public class Robot extends TimedRobot {
             m_robotContainer.drivetrain.addVisionMeasurement(llMeasurement.pose, llMeasurement.timestampSeconds);
         }
 
-       SmartDashboard.putNumber("currentTurretAngle", m_turret.m_turret.getPosition().getValueAsDouble());
-       SmartDashboard.putNumber("currentTurretOffset", m_turret.returnOffset());
+
         
 
     }
