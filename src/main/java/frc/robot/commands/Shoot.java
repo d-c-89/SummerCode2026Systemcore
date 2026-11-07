@@ -14,14 +14,14 @@ import frc.robot.subsystems.KickerSubsystem;
 import org.wpilib.command2.Command;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
-import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.*;
+import org.wpilib.telemetry.*;
 import org.wpilib.driverstation.MatchState;
 import org.wpilib.driverstation.RobotState;
 import org.wpilib.driverstation.Alliance;
 import org.wpilib.driverstation.MatchType;
 import org.wpilib.driverstation.DriverStationErrors;
 import org.wpilib.driverstation.Alliance;
-import org.wpilib.smartdashboard.SendableChooser;
 import org.wpilib.system.Timer;
 
 
@@ -41,6 +41,8 @@ public class Shoot extends Command {
   private double ShootAngle;
   private double ShootRPS;
   private double time;
+
+
   //private final RunIntakeHopper m_subsystem;
 
   /**
@@ -105,13 +107,9 @@ public class Shoot extends Command {
     double ShootRPS = operatorConstants.kShooterBoost*(launchVelocity*2)/(Math.PI*shooterWheelRadius);
 
     //ShootAngle = 0; 
-    SmartDashboard.putNumber("distance to hub", distanceToHub);
+    Telemetry.log("distance to hub", distanceToHub);
 
-
-
-    SmartDashboard.putNumber("launch rps", ShootRPS);
-    
-
+    Telemetry.log("launch rps", ShootRPS);    
 
     m_shooter.setShooterSpeed(ShootRPS); //uses rps
     m_kicker.setKickerSpeed(-0.9);
@@ -158,7 +156,7 @@ public class Shoot extends Command {
       adjustedShootAngle-=(2*Math.PI);
     }
      
-    SmartDashboard.putNumber("angle to hub", Math.toDegrees(angleToHubNorthRadians));
+    Telemetry.log("angle to hub", Math.toDegrees(angleToHubNorthRadians));    
 
     if (adjustedShootAngle > Math.toRadians(60)){
       adjustedShootAngle=Math.toRadians(60);
@@ -169,8 +167,7 @@ public class Shoot extends Command {
     
     //turret gear ratio 1:10. 36 degrees per rotation
     m_turret.goToLocation((-adjustedShootAngle+m_turret.returnOffset())/Math.toRadians(36));
-    SmartDashboard.putNumber("adjustedShootAngle", Math.toDegrees(adjustedShootAngle));
-
+    Telemetry.log("adjustedShootAngle", Math.toDegrees(adjustedShootAngle));
   }
 
   // Called once the command ends or is interrupted.
