@@ -1,4 +1,4 @@
-package first.robot.subsystems;
+package frc.robot.subsystems;
 
 import static org.wpilib.units.Units.*;
 
@@ -30,7 +30,7 @@ import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
-import first.robot.generated.TunerConstants.TunerSwerveDrivetrain;
+import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
 
 /**
  * Class that extends the Phoenix 6 SwerveDrivetrain class and implements

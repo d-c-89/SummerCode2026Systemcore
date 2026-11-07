@@ -12,8 +12,8 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import org.wpilib.math.geometry.Rotation2d;
-import org.wpilib.smartdashboard.SendableChooser;
-import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.telemetry.Telemetry;
+import frc.robot.SwerveTelemetry;
 import org.wpilib.command2.Command;
 import org.wpilib.command2.Commands;
 import org.wpilib.command2.button.CommandGamepad;
@@ -39,13 +39,14 @@ import frc.robot.commands.ShootOnTheMove;
 import frc.robot.commands.RunIntake;
 import frc.robot.commands.DeployIntake;
 import frc.robot.commands.RetractIntake;
+import org.wpilib.tunable.Selectable;
 
 
 //import frc.robot.subsystems.ShooterSubsystem;
 
 public class RobotContainer {
     
-    private final SendableChooser<Command> autoSelector;
+    private final Selectable<Command> autoChooser;
 
     private double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
@@ -57,7 +58,7 @@ public class RobotContainer {
     private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
     private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
 
-    private final Telemetry logger = new Telemetry(MaxSpeed);
+    private final SwerveTelemetry logger = new SwerveTelemetry(MaxSpeed);
 
     private final CommandGamepad driverController0 = new CommandGamepad(0);
     private final CommandGamepad driverController1 = new CommandGamepad(1);
@@ -83,8 +84,8 @@ public class RobotContainer {
 
         drivetrain.initTelemetry();
         configureBindings();
-        autoSelector = AutoBuilder.buildAutoChooser();
-        SmartDashboard.putData("Auto", autoSelector);
+        autoChooser = AutoBuilder.buildAutoChooser();
+        Telemetry.log("Auto", autoChooser);
     }
 
     private void configureBindings() {
@@ -134,10 +135,10 @@ public class RobotContainer {
         // Run SysId routines when holding back/start and X/Y.
         // Note that each routine should be run exactly once in a single log.
 
-        driverController0.back().and(driverController0.button(yButton)).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
-        driverController0.back().and(driverController0.button(xButton)).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
-        driverController0.start().and(driverController0.button(yButton)).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
-        driverController0.start().and(driverController0.button(xButton)).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
+        driverController0.back().and(driverController0.button(yButton)).whileTrue(drivetrain.sysIdDynamic(Direction.FORWARD));
+        driverController0.back().and(driverController0.button(xButton)).whileTrue(drivetrain.sysIdDynamic(Direction.REVERSE));
+        driverController0.start().and(driverController0.button(yButton)).whileTrue(drivetrain.sysIdQuasistatic(Direction.FORWARD));
+        driverController0.start().and(driverController0.button(xButton)).whileTrue(drivetrain.sysIdQuasistatic(Direction.REVERSE));
 
         // Reset the field-centric heading on left bumper press.
         //driverController0.leftBumper().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
@@ -179,8 +180,8 @@ public class RobotContainer {
 
     public Command getAutonomousCommand() {
         // Simple drive forward auton
-        drivetrain.runOnce(() -> drivetrain.seedFieldCentric(Rotation2d.kZero));
+        drivetrain.runOnce(drivetrain::seedFieldCentric);
         //return new PathPlannerAuto("Example Auto");
-        return autoSelector.getSelected();
+        return autoChooser.getSelected();
     }
 }
