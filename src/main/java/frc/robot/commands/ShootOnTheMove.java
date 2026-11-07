@@ -125,7 +125,8 @@ public class ShootOnTheMove extends Command {
     
     var state = m_drivetrain.getState();
     Pose2d pose = state.Pose;
-    ChassisVelocities v = ChassisVelocities.fromRobotRelativeSpeeds(state.Speeds, pose.getRotation());
+    ChassisVelocities v = new ChassisVelocities(state.Velocity.vx, state.Velocity.vy, state.Velocity.omega);
+    v = v.toRobotRelative(pose.getRotation());
     Translation2d robotVel = new Translation2d(v.vx, v.vy);
 
     // Where the robot will be when the shot actually happens
