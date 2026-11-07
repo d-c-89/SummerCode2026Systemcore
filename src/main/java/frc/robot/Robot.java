@@ -7,6 +7,7 @@ package frc.robot;
 
 import com.ctre.phoenix6.HootAutoReplay;
 
+//make sure the CameraServer dependency is installed!
 import org.wpilib.vision.stream.CameraServer;
 import org.wpilib.vision.camera.HttpCamera;
 
