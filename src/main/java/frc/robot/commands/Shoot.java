@@ -14,7 +14,7 @@ import frc.robot.subsystems.KickerSubsystem;
 import org.wpilib.command2.Command;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
-import org.wpilib.*;
+
 import org.wpilib.telemetry.*;
 import org.wpilib.driverstation.MatchState;
 import org.wpilib.driverstation.RobotState;
