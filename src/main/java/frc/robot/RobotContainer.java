@@ -181,7 +181,8 @@ public class RobotContainer {
 
     public Command getAutonomousCommand() {
         // Simple drive forward auton
-        drivetrain.runOnce(drivetrain::seedFieldCentric);
+        //drivetrain.runOnce(() -> drivetrain.seedFieldCentric(Rotation2d.kZero));
+        //ABOVE LINE WAS PREVIOUSLY IN 2026 CODE, BUT REMOVED
         //return new PathPlannerAuto("Example Auto");
         return autoChooser.getSelected();
     }
