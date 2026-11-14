@@ -129,7 +129,6 @@ public class ShooterSubsystem extends SubsystemBase
 
     followerSim.setSupplyVoltage(RobotController.getBatteryVoltage());
 
-  
     leaderSimModel.setInputVoltage(leaderMotorVoltage.in(Volts));
     leaderSimModel.update(0.020);
     leaderSim.setRotorVelocity(leaderSimModel.getAngularVelocity());

@@ -51,7 +51,7 @@ public class ShootOnTheMove extends Command {
   private double hubX;
   private double hubY;
   private double time;
-  private DoublePublisher ShooterPub;
+  //private DoublePublisher ShooterPub;
 
 
   private final TunableDouble latency = Tunables.addDouble("kLatency", 0.12);
@@ -81,10 +81,10 @@ public class ShootOnTheMove extends Command {
     addRequirements(hopper);
     this.time = time;
 
-    final DoublePublisher ShooterPub = NetworkTableInstance.getDefault()
+    /*final DoublePublisher ShooterPub = NetworkTableInstance.getDefault()
       .getTable("shooter")
       .getDoubleTopic("Shooter commanded speed")
-      .publish();
+      .publish();*/
 
   }
 
@@ -164,7 +164,7 @@ public class ShootOnTheMove extends Command {
       
     m_turret.goToLocation((-angle + m_turret.returnOffset()) / Math.toRadians(36));
     m_shooter.setShooterSpeed(rpsFor(d));
-    ShooterPub.set(rpsFor(d));
+    Telemetry.log("commanded shooter speed", rpsFor(d));
     m_kicker.setKickerSpeed(operatorConstants.kKickerSpeed);
     m_hopper.setHopperSpeed(operatorConstants.kHopperSpeed);
     /*if (inRange  && m_shooter.atSpeed() && m_turret.atTarget() ) {
