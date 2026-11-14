@@ -19,7 +19,6 @@ import org.wpilib.hardware.bus.CANPort;
 import org.wpilib.math.system.LinearSystem;
 import org.wpilib.simulation.*;
 import org.wpilib.system.RobotController;
-import org.wpilib.simulation.LinearSystemSim;
 import org.wpilib.math.system.DCMotor;
 import org.wpilib.math.system.Models;
 import com.ctre.phoenix6.sim.ChassisReference;
@@ -32,8 +31,9 @@ public class ShooterSubsystem extends SubsystemBase
 {
   public TalonFX m_leader;
   public TalonFX m_follower;
-  public TalonFXSimState leaderSim;
-  public FlywheelSim leaderSimModel; 
+  private TalonFXSimState leaderSim;
+  private FlywheelSim leaderSimModel; 
+  private TalonFXSimState followerSim;
   /** Creates a new ExampleSubsystem. */
 
   // setup shooter subsystem
@@ -61,11 +61,13 @@ public class ShooterSubsystem extends SubsystemBase
 
   m_leader.getConfigurator().apply(talonFXConfigs);
   
-  final FlywheelSim leaderSimModel = new FlywheelSim(
-    Models.flywheelFromPhysicalConstants(DCMotor.getKrakenX60(1), 0.003746, 1),
-    DCMotor.getKrakenX60(1)
+   leaderSimModel = new FlywheelSim(
+    Models.flywheelFromPhysicalConstants(DCMotor.getKrakenX60(2), 0.003746, 1),
+    DCMotor.getKrakenX60(2)
   );
-  
+
+  leaderSim = m_leader.getSimState();
+  followerSim = m_follower.getSimState();
 
   }
   public void setShooterSpeed(double speed)
@@ -111,9 +113,10 @@ public class ShooterSubsystem extends SubsystemBase
   }
   public void simulationInit() {
     
-    final TalonFXSimState leaderSim = m_leader.getSimState();
+    
     leaderSim.Orientation = ChassisReference.Clockwise_Positive;
     leaderSim.setMotorType(TalonFXSimState.MotorType.KrakenX60);
+    followerSim.setMotorType(TalonFXSimState.MotorType.KrakenX60);
 
   }
 
@@ -122,11 +125,16 @@ public class ShooterSubsystem extends SubsystemBase
     // This method will be called once per scheduler run during simulation
     leaderSim.setSupplyVoltage(RobotController.getBatteryVoltage());
 
-    var motorVoltage = leaderSim.getMotorVoltageMeasure();
+    var leaderMotorVoltage = leaderSim.getMotorVoltageMeasure();
 
-    leaderSimModel.setInputVoltage(motorVoltage.in(Volts));
+    followerSim.setSupplyVoltage(RobotController.getBatteryVoltage());
+
+  
+    leaderSimModel.setInputVoltage(leaderMotorVoltage.in(Volts));
     leaderSimModel.update(0.020);
     leaderSim.setRotorVelocity(leaderSimModel.getAngularVelocity());
+
+    followerSim.setRotorVelocity(leaderSimModel.getAngularVelocity());
 
   }
 }
