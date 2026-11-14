@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems;
 
+import static org.wpilib.units.Units.Volts;
+
 import org.wpilib.command2.Command;
 import org.wpilib.command2.SubsystemBase;
 
@@ -14,6 +16,15 @@ import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import org.wpilib.hardware.bus.CANPort;
+import org.wpilib.math.system.LinearSystem;
+import org.wpilib.simulation.*;
+import org.wpilib.system.RobotController;
+import org.wpilib.simulation.LinearSystemSim;
+import org.wpilib.math.system.DCMotor;
+import org.wpilib.math.system.Models;
+import com.ctre.phoenix6.sim.ChassisReference;
+import com.ctre.phoenix6.sim.TalonFXSimState;
+import org.wpilib.units.VoltageUnit;
 
 import frc.robot.Constants.operatorConstants;
 
@@ -21,6 +32,8 @@ public class ShooterSubsystem extends SubsystemBase
 {
   public TalonFX m_leader;
   public TalonFX m_follower;
+  public TalonFXSimState leaderSim;
+  public FlywheelSim leaderSimModel; 
   /** Creates a new ExampleSubsystem. */
 
   // setup shooter subsystem
@@ -47,6 +60,12 @@ public class ShooterSubsystem extends SubsystemBase
   motionMagicConfigs.MotionMagicJerk = 4000; // Target jerk of 4000 rps/s/s (0.1 seconds)
 
   m_leader.getConfigurator().apply(talonFXConfigs);
+  
+  final FlywheelSim leaderSimModel = new FlywheelSim(
+    Models.flywheelFromPhysicalConstants(DCMotor.getKrakenX60(1), 0.003746, 1),
+    DCMotor.getKrakenX60(1)
+  );
+  
 
   }
   public void setShooterSpeed(double speed)
@@ -90,14 +109,24 @@ public class ShooterSubsystem extends SubsystemBase
     // Query some boolean state, such as a digital sensor.
     return false;
   }
+  public void simulationInit() {
+    
+    final TalonFXSimState leaderSim = m_leader.getSimState();
+    leaderSim.Orientation = ChassisReference.Clockwise_Positive;
+    leaderSim.setMotorType(TalonFXSimState.MotorType.KrakenX60);
 
-  @Override
-  public void periodic() {
-    // This method will be called once per scheduler run
   }
 
   @Override
   public void simulationPeriodic() {
     // This method will be called once per scheduler run during simulation
+    leaderSim.setSupplyVoltage(RobotController.getBatteryVoltage());
+
+    var motorVoltage = leaderSim.getMotorVoltageMeasure();
+
+    leaderSimModel.setInputVoltage(motorVoltage.in(Volts));
+    leaderSimModel.update(0.020);
+    leaderSim.setRotorVelocity(leaderSimModel.getAngularVelocity());
+
   }
 }
