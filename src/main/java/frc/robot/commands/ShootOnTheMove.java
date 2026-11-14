@@ -13,6 +13,7 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.KickerSubsystem;
 import org.wpilib.command2.Command;
 import org.wpilib.math.util.MathUtil;
+import org.wpilib.networktables.NetworkTableInstance;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Translation2d;
@@ -28,6 +29,8 @@ import org.wpilib.driverstation.MatchType;
 import org.wpilib.driverstation.DriverStationErrors;
 import org.wpilib.driverstation.Alliance;
 import org.wpilib.system.Timer;
+
+import org.wpilib.networktables.DoublePublisher;
 
 
 import frc.robot.Constants.operatorConstants;
@@ -48,6 +51,7 @@ public class ShootOnTheMove extends Command {
   private double hubX;
   private double hubY;
   private double time;
+  private DoublePublisher ShooterPub;
 
 
   private final TunableDouble latency = Tunables.addDouble("kLatency", 0.12);
@@ -76,6 +80,11 @@ public class ShootOnTheMove extends Command {
     m_hopper = hopper;
     addRequirements(hopper);
     this.time = time;
+
+    final DoublePublisher ShooterPub = NetworkTableInstance.getDefault()
+      .getTable("shooter")
+      .getDoubleTopic("Shooter commanded speed")
+      .publish();
 
   }
 
@@ -155,6 +164,7 @@ public class ShootOnTheMove extends Command {
       
     m_turret.goToLocation((-angle + m_turret.returnOffset()) / Math.toRadians(36));
     m_shooter.setShooterSpeed(rpsFor(d));
+    ShooterPub.set(rpsFor(d));
     m_kicker.setKickerSpeed(operatorConstants.kKickerSpeed);
     m_hopper.setHopperSpeed(operatorConstants.kHopperSpeed);
     /*if (inRange  && m_shooter.atSpeed() && m_turret.atTarget() ) {
