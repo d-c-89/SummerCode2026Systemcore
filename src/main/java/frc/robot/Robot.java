@@ -21,7 +21,13 @@ import org.wpilib.smartdashboard.Field2d;
 import org.wpilib.telemetry.*;
 import org.wpilib.command2.Command;
 import org.wpilib.command2.CommandScheduler;
-import frc.robot.LimelightHelpers.PoseEstimate;
+
+import com.limelightvision.IMUMode;
+import com.limelightvision.Limelight;
+import com.limelightvision.PoseEstimate;
+import com.limelightvision.PoseEstimateType;
+
+import org.wpilib.math.geometry.Pose3d;
 import org.wpilib.math.util.Units;
 import frc.robot.subsystems.TurretSubsystem;
 
@@ -31,6 +37,7 @@ import frc.robot.subsystems.TurretSubsystem;
 public class Robot extends TimedRobot {
     private Command m_autonomousCommand;
     TurretSubsystem m_turret = new TurretSubsystem();
+    Limelight camera;
 
     private final RobotContainer m_robotContainer;
     
@@ -41,6 +48,7 @@ public class Robot extends TimedRobot {
 
     public Robot() {
         m_robotContainer = new RobotContainer();
+        camera = new Limelight("limelight");
     }
 
     @Override
@@ -48,7 +56,7 @@ public class Robot extends TimedRobot {
         m_timeAndJoystickReplay.update();
         CommandScheduler.getInstance().run(); 
 
-        LimelightHelpers.SetIMUMode("limelight", 0);
+        camera.setIMUMode(IMUMode.EXTERNAL);
         // Updating vision with limelight
         var driveState = m_robotContainer.drivetrain.getState();
         double headingDeg = driveState.Pose.getRotation().getDegrees();
@@ -57,18 +65,19 @@ public class Robot extends TimedRobot {
        
         //use tag filtering to decide whether to use mt1 or mt2
 
-        LimelightHelpers.SetRobotOrientation("limelight", headingDeg, omegaRps*360, 0, 0, 0, 0); // Changed limelight orientation here. 
+        camera.setRobotOrientation(headingDeg, omegaRps*360, 0.0, 0.0, 0.0, 0.0, true); // Changed limelight orientation here. 
         PoseEstimate llMeasurement;
         if (RobotState.isAutonomous())
         {
-            llMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight");
+            llMeasurement = camera.getPoseEstimate(PoseEstimateType.MT2_WPIBLUE);
             //llMeasurement= LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");
         }
         else 
         {
-            llMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");
+            //llMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");
+            llMeasurement = camera.getPoseEstimate(PoseEstimateType.MT1_WPIBLUE);
         }
-        if (llMeasurement != null && llMeasurement.tagCount > 0 && Math.abs(omegaRps) < 2.0) {
+        if (llMeasurement != null && llMeasurement.reportedTagCount > 0 && Math.abs(omegaRps) < 2.0) {
             m_robotContainer.drivetrain.addVisionMeasurement(llMeasurement.pose, llMeasurement.timestampSeconds);
         }
 
@@ -79,7 +88,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void disabledInit() {
-        LimelightHelpers.SetIMUMode("limelight", 1);
+        camera.setIMUMode(IMUMode.EXTERNAL_SEED_INTERNAL);
         
     }
 
