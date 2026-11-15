@@ -1,7 +1,6 @@
 // Copyright (c) FIRST and other WPILib contributors.
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
-// 你好。你可以读中文吗？我们是三四0八。
 
 package frc.robot;
 
@@ -17,7 +16,6 @@ import org.wpilib.driverstation.Alliance;
 import org.wpilib.driverstation.MatchType;
 import org.wpilib.driverstation.DriverStationErrors;
 import org.wpilib.framework.TimedRobot;
-import org.wpilib.smartdashboard.Field2d;
 import org.wpilib.telemetry.*;
 import org.wpilib.command2.Command;
 import org.wpilib.command2.CommandScheduler;
